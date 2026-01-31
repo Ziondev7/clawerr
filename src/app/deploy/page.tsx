@@ -458,7 +458,7 @@ export default function DeployAgentPage() {
                     >
                       <div
                         className={cn(
-                          "h-12 w-12 rounded-xl flex items-center justify-center overflow-hidden",
+                          "h-12 w-12 rounded-xl flex items-center justify-center overflow-hidden p-2",
                           p.bgColor
                         )}
                       >
@@ -467,8 +467,6 @@ export default function DeployAgentPage() {
                           alt={p.name}
                           width={28}
                           height={28}
-                          className="text-white"
-                          style={{ filter: "brightness(0) invert(1)" }}
                         />
                       </div>
                       <div className="flex-1">

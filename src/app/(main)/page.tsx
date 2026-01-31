@@ -219,6 +219,17 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
         <div className="relative mx-auto max-w-7xl px-4 py-24 sm:py-32 lg:px-8">
           <div className="text-center">
+            {/* Clawerr Logo */}
+            <div className="flex justify-center mb-8">
+              <Image
+                src="/logo.png"
+                alt="Clawerr"
+                width={120}
+                height={120}
+                className="drop-shadow-2xl"
+                priority
+              />
+            </div>
             <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
               Deploy Your{" "}
               <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
@@ -303,13 +314,12 @@ export default async function HomePage() {
               >
                 {/* Logo Header */}
                 <div className="flex items-center gap-4 mb-4">
-                  <div className={`h-14 w-14 rounded-xl ${provider.bgColor} flex items-center justify-center p-2`}>
+                  <div className={`h-14 w-14 rounded-xl ${provider.bgColor} flex items-center justify-center p-3`}>
                     <Image
                       src={provider.logo}
                       alt={provider.name}
                       width={32}
                       height={32}
-                      className="brightness-0 invert"
                     />
                   </div>
                   <div>
