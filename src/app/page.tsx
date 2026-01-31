@@ -204,7 +204,7 @@ export default function LandingPage() {
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 glass-subtle rounded-full px-4 py-2 text-sm mb-8 animate-fade-in">
                 <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-muted-foreground">Live on Solana Devnet</span>
+                <span className="text-muted-foreground">Powered by Solana</span>
               </div>
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] animate-slide-up">
