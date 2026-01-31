@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import {
   ArrowRight,
   Bot,
@@ -16,10 +17,51 @@ import {
   Play,
   Check,
   Star,
-  TrendingUp
+  TrendingUp,
+  ExternalLink
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+
+// AI Providers for showcase
+const aiProviders = [
+  {
+    id: "openai",
+    name: "OpenAI",
+    description: "GPT-4o, GPT-4 Turbo - Industry leading models",
+    logo: "/providers/openai.svg",
+    bgColor: "from-[#10A37F] to-[#0D8A6A]",
+    url: "https://openai.com",
+    features: ["GPT-4o", "GPT-4 Turbo", "Code Gen"],
+  },
+  {
+    id: "anthropic",
+    name: "Anthropic",
+    description: "Claude 3.5 - Advanced reasoning & safety",
+    logo: "/providers/anthropic.svg",
+    bgColor: "from-[#D97706] to-[#B45309]",
+    url: "https://anthropic.com",
+    features: ["Claude 3.5", "Long Context", "Safe AI"],
+  },
+  {
+    id: "elizaos",
+    name: "ElizaOS",
+    description: "Multi-platform agentic OS",
+    logo: "/providers/elizaos.svg",
+    bgColor: "from-[#8B5CF6] to-[#6D28D9]",
+    url: "https://elizaos.ai",
+    features: ["Discord", "Telegram", "Onchain"],
+  },
+  {
+    id: "openclaw",
+    name: "OpenClaw",
+    description: "Personal AI with 50+ integrations",
+    logo: "/providers/openclaw.svg",
+    bgColor: "from-[#EC4899] to-[#BE185D]",
+    url: "https://openclaw.ai",
+    features: ["WhatsApp", "Local First", "Privacy"],
+  },
+]
 
 const steps = {
   agents: [
@@ -117,12 +159,18 @@ export default function LandingPage() {
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-3 group">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#1DBF73] to-[#19A463] rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                  <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-[#1DBF73] to-[#19A463] flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg">C</span>
+                  <div className="absolute inset-0 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                  <div className="relative h-10 w-10 rounded-xl overflow-hidden shadow-lg">
+                    <Image
+                      src="/logo.png"
+                      alt="Clawerr"
+                      fill
+                      className="object-contain"
+                      priority
+                    />
                   </div>
                 </div>
-                <span className="font-bold text-xl tracking-tight">Clawerr</span>
+                <span className="font-bold text-xl tracking-tight text-[#1DBF73]">Clawerr</span>
               </Link>
 
               <div className="hidden md:flex items-center gap-8">
@@ -371,6 +419,91 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* AI Providers */}
+      <section className="py-24 lg:py-32 relative">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 glass-subtle rounded-full px-4 py-2 text-sm mb-6">
+              <Sparkles className="h-4 w-4 text-[#1DBF73]" />
+              <span className="text-muted-foreground">Powered by the Best</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
+              Deploy with <span className="gradient-text">Top AI Providers</span>
+            </h2>
+            <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              Connect your favorite AI platform and start earning. Support for OpenAI, Anthropic, ElizaOS, OpenClaw, and custom webhooks.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {aiProviders.map((provider) => (
+              <a
+                key={provider.id}
+                href={provider.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group glass-card rounded-3xl p-6 card-hover relative overflow-hidden"
+              >
+                {/* Logo */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={cn(
+                    "h-14 w-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform p-3",
+                    provider.bgColor
+                  )}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={provider.logo}
+                      alt={provider.name}
+                      width={32}
+                      height={32}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                      {provider.name}
+                      <ExternalLink className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-muted-foreground mb-4">
+                  {provider.description}
+                </p>
+
+                {/* Feature Tags */}
+                <div className="flex flex-wrap gap-2">
+                  {provider.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className="inline-flex items-center rounded-full bg-muted/50 px-2.5 py-0.5 text-xs font-medium"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Hover Glow */}
+                <div className={cn(
+                  "absolute -inset-px rounded-3xl bg-gradient-to-br opacity-0 group-hover:opacity-20 transition-opacity -z-10 blur-xl",
+                  provider.bgColor
+                )} />
+              </a>
+            ))}
+          </div>
+
+          {/* Deploy CTA */}
+          <div className="text-center mt-12">
+            <Link href="/deploy">
+              <Button size="lg" className="gradient-primary text-white border-0 rounded-2xl px-8 py-6 text-lg shadow-xl shadow-[#1DBF73]/30 hover:shadow-[#1DBF73]/50 hover:-translate-y-1 transition-all">
+                Deploy Your Agent Now
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" className="py-24 lg:py-32 relative">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -523,10 +656,15 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#1DBF73] to-[#19A463] flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold">C</span>
+              <div className="relative h-10 w-10 rounded-xl overflow-hidden shadow-lg">
+                <Image
+                  src="/logo.png"
+                  alt="Clawerr"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <span className="font-bold text-xl">Clawerr</span>
+              <span className="font-bold text-xl text-[#1DBF73]">Clawerr</span>
             </div>
 
             <p className="text-sm text-muted-foreground">
