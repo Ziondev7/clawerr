@@ -1,0 +1,450 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============ User System ============
+
+enum UserType {
+  HUMAN
+  AGENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  type          UserType  @default(HUMAN)
+  walletAddress String    @unique
+  displayName   String?
+  avatar        String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  agentProfile     AgentProfile?
+  gigsAsSeller     Gig[]             @relation("SellerGigs")
+  ordersAsBuyer    Order[]           @relation("BuyerOrders")
+  ordersAsSeller   Order[]           @relation("SellerOrders")
+  reviewsAuthored  Review[]          @relation("AuthorReviews")
+  reviewsReceived  Review[]          @relation("TargetReviews")
+  notifications    Notification[]
+  sessions         Session[]
+  featuredListings FeaturedListing[]
+
+  @@index([walletAddress])
+  @@index([type])
+}
+
+enum AgentProvider {
+  OPENAI
+  ANTHROPIC
+  CUSTOM
+}
+
+model AgentProfile {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  openclawId      String?       @unique
+  capabilities    String[]      @default([])
+  averageRating   Float         @default(0)
+  totalReviews    Int           @default(0)
+  completionRate  Float         @default(100)
+  responseTimeHrs Float         @default(24)
+  verified        Boolean       @default(false)
+
+  // AI Agent Configuration
+  provider        AgentProvider @default(OPENAI)
+  model           String        @default("gpt-4-turbo-preview")
+  systemPrompt    String        @default("You are a helpful AI assistant that completes tasks professionally and thoroughly.")
+  webhookUrl      String?       // For custom agents
+  encryptedApiKey String?       // Encrypted API key for OpenAI/Anthropic
+  maxTokens       Int           @default(4096)
+  temperature     Float         @default(0.7)
+
+  // Auto-execution settings
+  autoExecute     Boolean       @default(true) // Automatically process orders
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([openclawId])
+  @@index([provider])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+// ============ Categories ============
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  icon        String?
+  parentId    String?
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  gigs     Gig[]
+
+  @@index([slug])
+  @@index([parentId])
+}
+
+// ============ Gigs ============
+
+enum GigStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  REJECTED
+}
+
+model Gig {
+  id            String    @id @default(cuid())
+  sellerId      String
+  categoryId    String
+  title         String
+  slug          String    @unique
+  description   String
+  images        String[]  @default([])
+  tags          String[]  @default([])
+  status        GigStatus @default(DRAFT)
+  featured      Boolean   @default(false)
+  featuredUntil DateTime?
+  totalOrders   Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  seller           User              @relation("SellerGigs", fields: [sellerId], references: [id], onDelete: Cascade)
+  category         Category          @relation(fields: [categoryId], references: [id])
+  packages         GigPackage[]
+  orders           Order[]
+  faqs             GigFaq[]
+  featuredListings FeaturedListing[]
+
+  @@index([sellerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([slug])
+  @@index([featuredUntil])
+}
+
+enum PackageTier {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+model GigPackage {
+  id           String      @id @default(cuid())
+  gigId        String
+  tier         PackageTier
+  name         String
+  description  String
+  priceLamports BigInt
+  deliveryDays Int
+  revisions    Int         @default(1)
+  features     String[]    @default([])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  gig    Gig     @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@unique([gigId, tier])
+  @@index([gigId])
+}
+
+model GigFaq {
+  id        String   @id @default(cuid())
+  gigId     String
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+}
+
+// ============ Orders ============
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAYMENT_PROCESSING
+  IN_PROGRESS
+  DELIVERED
+  REVISION_REQUESTED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  REFUNDED
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   String        @unique @default(cuid())
+  buyerId       String
+  sellerId      String
+  gigId         String
+  packageId     String
+  status        OrderStatus   @default(PENDING_PAYMENT)
+  requirements  String?
+  priceLamports BigInt
+  platformFee   BigInt        @default(0)
+  paymentMethod PaymentMethod @default(SOL)
+  priceTokens   BigInt?       // For $CLAWERR payments
+  dueDate       DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  buyer      User               @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller     User               @relation("SellerOrders", fields: [sellerId], references: [id])
+  gig        Gig                @relation(fields: [gigId], references: [id])
+  package    GigPackage         @relation(fields: [packageId], references: [id])
+  deliveries OrderDelivery[]
+  escrow     EscrowTransaction?
+  messages   OrderMessage[]
+  reviews    Review[]
+  disputes   Dispute[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+  @@index([orderNumber])
+}
+
+model OrderDelivery {
+  id          String   @id @default(cuid())
+  orderId     String
+  message     String
+  attachments String[] @default([])
+  isRevision  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model OrderMessage {
+  id        String   @id @default(cuid())
+  orderId   String
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+// ============ Escrow ============
+
+enum EscrowStatus {
+  PENDING
+  FUNDED
+  RELEASED
+  REFUNDED
+  DISPUTED
+}
+
+model EscrowTransaction {
+  id             String        @id @default(cuid())
+  orderId        String        @unique
+  escrowPda      String        @unique
+  vaultPda       String
+  amountLamports BigInt
+  paymentMethod  PaymentMethod @default(SOL)
+  tokenAmount    BigInt?
+  tokenMint      String?
+  status         EscrowStatus  @default(PENDING)
+  fundedAt       DateTime?
+  releasedAt     DateTime?
+  refundedAt     DateTime?
+  txSignature    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([escrowPda])
+  @@index([status])
+}
+
+// ============ Reviews ============
+
+model Review {
+  id          String   @id @default(cuid())
+  orderId     String
+  authorId    String
+  targetId    String
+  rating      Float
+  quality     Float?
+  communication Float?
+  value       Float?
+  comment     String?
+  response    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author User  @relation("AuthorReviews", fields: [authorId], references: [id])
+  target User  @relation("TargetReviews", fields: [targetId], references: [id])
+
+  @@unique([orderId, authorId])
+  @@index([targetId])
+}
+
+// ============ Disputes ============
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_BUYER
+  RESOLVED_SELLER
+  RESOLVED_SPLIT
+  CLOSED
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  orderId     String
+  openedById  String
+  reason      String
+  description String
+  evidence    String[]      @default([])
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  buyerAmount BigInt?
+  sellerAmount BigInt?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+}
+
+// ============ Notifications ============
+
+enum NotificationType {
+  ORDER_CREATED
+  ORDER_PAID
+  ORDER_DELIVERED
+  ORDER_COMPLETED
+  ORDER_CANCELLED
+  REVISION_REQUESTED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  REVIEW_RECEIVED
+  MESSAGE_RECEIVED
+  PAYOUT_SENT
+  FEATURED_PURCHASED
+  FEATURED_EXPIRED
+}
+
+// ============ Payment Methods ============
+
+enum PaymentMethod {
+  SOL
+  CLAWERR
+}
+
+enum FeaturedListingStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  EXPIRED
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+}
+
+// ============ Featured Listings ============
+
+model FeaturedListing {
+  id           String                @id @default(cuid())
+  gigId        String
+  userId       String
+  status       FeaturedListingStatus @default(PENDING_PAYMENT)
+  durationDays Int
+  tokenAmount  BigInt
+  txSignature  String?
+  startedAt    DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  gig  Gig  @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([gigId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([status])
+}
+
+// ============ Token Fee Tracking ============
+
+model TokenFeeCollection {
+  id          String   @id @default(cuid())
+  orderId     String?
+  listingId   String?
+  tokenMint   String
+  amount      BigInt
+  feeType     String   // "ORDER_FEE" | "FEATURED_LISTING"
+  txSignature String
+  collectedAt DateTime @default(now())
+
+  @@index([collectedAt])
+  @@index([feeType])
+}
+
+// ============ Featured Pricing Configuration ============
+
+model FeaturedPricing {
+  id           String  @id @default(cuid())
+  durationDays Int     @unique
+  tokenAmount  BigInt
+  active       Boolean @default(true)
+}

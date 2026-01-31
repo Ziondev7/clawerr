@@ -1,26 +1,786 @@
+@import url('https://fonts.googleapis.com/css2?family=Macan:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================
+   FIVERR-INSPIRED COLOR SYSTEM
+   Primary: #1DBF73 (Fiverr Green)
+   Secondary: #0D084D (Deep Navy)
+   Accent: #FFE0B3 (Warm Highlight)
+   ============================================ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 153 73% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 153 73% 43%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 153 73% 43%;
+    --radius: 0.75rem;
+
+    /* Fiverr Brand Colors */
+    --fiverr-green: 153 73% 43%;
+    --fiverr-green-dark: 153 73% 36%;
+    --fiverr-green-light: 153 73% 50%;
+    --fiverr-navy: 246 80% 17%;
+    --fiverr-warm: 36 100% 85%;
+    --fiverr-gray: 222 11% 40%;
+
+    /* Glassmorphism variables */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --glass-blur: 20px;
+
+    /* Gradient colors - Fiverr style */
+    --gradient-start: 153 73% 43%;
+    --gradient-mid: 160 70% 38%;
+    --gradient-end: 170 65% 35%;
+
+    /* Accent colors */
+    --cyan: 180 100% 40%;
+    --success: 153 73% 43%;
+    --warning: 36 100% 50%;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 153 73% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 153 73% 47%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 15%;
+    --input: 240 6% 15%;
+    --ring: 153 73% 47%;
+
+    /* Dark glassmorphism */
+    --glass-bg: rgba(15, 15, 20, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  code, pre, .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
 }
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius: var(--radius);
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Fiverr green utilities */
+  --color-fiverr: #1DBF73;
+  --color-fiverr-dark: #19A463;
+  --color-fiverr-light: #22D47E;
+  --color-fiverr-navy: #0D084D;
+  --color-fiverr-warm: #FFE0B3;
+}
+
+/* ============================================
+   GLASSMORPHISM UTILITIES
+   ============================================ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .glass-subtle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dark .glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-dark {
+  background: linear-gradient(
+    135deg,
+    rgba(13, 8, 77, 0.95) 0%,
+    rgba(20, 15, 90, 0.9) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   FIVERR GREEN GRADIENTS
+   ============================================ */
+
+.gradient-primary {
+  background: linear-gradient(
+    135deg,
+    #1DBF73 0%,
+    #19A463 100%
+  );
+}
+
+.gradient-primary-reverse {
+  background: linear-gradient(
+    135deg,
+    #19A463 0%,
+    #1DBF73 100%
+  );
+}
+
+.gradient-fiverr {
+  background: linear-gradient(
+    135deg,
+    #1DBF73 0%,
+    #17A865 50%,
+    #128A52 100%
+  );
+}
+
+.gradient-navy {
+  background: linear-gradient(
+    135deg,
+    #0D084D 0%,
+    #1A1060 50%,
+    #0D084D 100%
+  );
+}
+
+.gradient-mesh {
+  background:
+    radial-gradient(at 40% 20%, hsla(153, 73%, 43%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(160, 70%, 38%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(36, 100%, 85%, 0.12) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(153, 73%, 43%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(246, 80%, 17%, 0.1) 0px, transparent 50%);
+}
+
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    #1DBF73 0%,
+    #17A865 40%,
+    #1DBF73 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(
+    135deg,
+    #1DBF73 0%,
+    #FFE0B3 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gradient-border {
+  position: relative;
+  background: hsl(var(--background));
+  border-radius: var(--radius);
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius) + 2px);
+  background: linear-gradient(
+    135deg,
+    #1DBF73,
+    #19A463,
+    #FFE0B3,
+    #1DBF73
+  );
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease infinite;
+  z-index: -1;
+}
+
+/* ============================================
+   GLOW EFFECTS - FIVERR GREEN
+   ============================================ */
+
+.glow {
+  box-shadow:
+    0 0 20px rgba(29, 191, 115, 0.25),
+    0 0 40px rgba(29, 191, 115, 0.15),
+    0 0 60px rgba(29, 191, 115, 0.08);
+}
+
+.glow-hover {
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-hover:hover {
+  box-shadow:
+    0 0 30px rgba(29, 191, 115, 0.35),
+    0 0 60px rgba(29, 191, 115, 0.2),
+    0 0 90px rgba(29, 191, 115, 0.1);
+}
+
+.glow-text {
+  text-shadow:
+    0 0 10px rgba(29, 191, 115, 0.5),
+    0 0 20px rgba(29, 191, 115, 0.3),
+    0 0 40px rgba(29, 191, 115, 0.2);
+}
+
+.glow-warm {
+  box-shadow:
+    0 0 20px rgba(255, 224, 179, 0.3),
+    0 0 40px rgba(255, 224, 179, 0.2);
+}
+
+/* ============================================
+   ANIMATED BACKGROUNDS
+   ============================================ */
+
+.bg-aurora {
+  background:
+    linear-gradient(135deg, hsl(var(--background)) 0%, transparent 100%),
+    radial-gradient(ellipse at 20% 0%, rgba(29, 191, 115, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 0%, rgba(255, 224, 179, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 40% 100%, rgba(13, 8, 77, 0.08) 0%, transparent 50%),
+    hsl(var(--background));
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(29, 191, 115, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 191, 115, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.dark .bg-grid {
+  background-image:
+    linear-gradient(rgba(29, 191, 115, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 191, 115, 0.05) 1px, transparent 1px);
+}
+
+.bg-dots {
+  background-image: radial-gradient(rgba(29, 191, 115, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.bg-noise {
+  position: relative;
+}
+
+.bg-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+}
+
+/* ============================================
+   FLOATING ORBS / BLOBS - FIVERR COLORS
+   ============================================ */
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: float 20s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, rgba(29, 191, 115, 0.4), rgba(25, 164, 99, 0.3));
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, rgba(255, 224, 179, 0.25), rgba(29, 191, 115, 0.2));
+  animation-delay: -5s;
+}
+
+.orb-3 {
+  width: 350px;
+  height: 350px;
+  background: linear-gradient(135deg, rgba(13, 8, 77, 0.2), rgba(29, 191, 115, 0.15));
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -30px) scale(1.05); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(20px, 30px) scale(1.02); }
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR - FIVERR STYLE
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(29, 191, 115, 0.5),
+    rgba(25, 164, 99, 0.5)
+  );
+  border-radius: 8px;
+  border: 2px solid hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(29, 191, 115, 0.7),
+    rgba(25, 164, 99, 0.7)
+  );
+}
+
+/* ============================================
+   BUTTON ENHANCEMENTS - FIVERR STYLE
+   ============================================ */
+
+.btn-fiverr {
+  background: #1DBF73;
+  color: white;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-fiverr:hover {
+  background: #19A463;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 191, 115, 0.3);
+}
+
+.btn-glass {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    135deg,
+    #1DBF73,
+    #19A463,
+    #FFE0B3,
+    #1DBF73
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 3s ease infinite;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-glow:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   CARD ENHANCEMENTS
+   ============================================ */
+
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(29, 191, 115, 0.1);
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+}
+
+/* Fiverr-style card border on hover */
+.card-fiverr {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.card-fiverr::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  pointer-events: none;
+}
+
+.card-fiverr:hover::after {
+  border-color: #1DBF73;
+}
+
+/* ============================================
+   TEXT EFFECTS
+   ============================================ */
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--foreground)) 0%,
+    #1DBF73 50%,
+    hsl(var(--foreground)) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: -100% 50%; }
+}
+
+/* ============================================
+   FIVERR BADGE STYLES
+   ============================================ */
+
+.badge-pro {
+  background: linear-gradient(135deg, #0D084D, #1A1060);
+  color: white;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-top-rated {
+  background: linear-gradient(135deg, #FFE0B3, #FFD699);
+  color: #0D084D;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.badge-verified {
+  background: #1DBF73;
+  color: white;
+  font-weight: 600;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes blur-in {
+  from { opacity: 0; filter: blur(8px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29, 191, 115, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(29, 191, 115, 0); }
+}
+
+.animate-fade-in { animation: fade-in 0.5s ease forwards; }
+.animate-slide-up { animation: slide-up 0.5s ease forwards; }
+.animate-slide-down { animation: slide-down 0.5s ease forwards; }
+.animate-scale-in { animation: scale-in 0.4s ease forwards; }
+.animate-blur-in { animation: blur-in 0.6s ease forwards; }
+.animate-pulse-green { animation: pulse-green 2s ease-in-out infinite; }
+
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-800 { animation-delay: 800ms; }
+
+/* ============================================
+   SOLANA WALLET ADAPTER OVERRIDES - FIVERR STYLE
+   ============================================ */
+
+.wallet-adapter-button {
+  @apply !rounded-lg !font-semibold;
+  background: #1DBF73 !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-button:hover {
+  background: #19A463 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(29, 191, 115, 0.3) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.wallet-adapter-modal-container {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ============================================
+   FIVERR-STYLE STAR RATING
+   ============================================ */
+
+.star-rating {
+  color: #FFB33E;
+}
+
+.star-rating-empty {
+  color: #E4E5E7;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.mask-fade-b {
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.mask-fade-t {
+  mask-image: linear-gradient(to top, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 60%, transparent 100%);
+}
+
+/* Fiverr green text utility */
+.text-fiverr {
+  color: #1DBF73;
+}
+
+.text-fiverr-dark {
+  color: #19A463;
+}
+
+.bg-fiverr {
+  background-color: #1DBF73;
+}
+
+.bg-fiverr-dark {
+  background-color: #19A463;
+}
+
+.border-fiverr {
+  border-color: #1DBF73;
+}
+
+/* ============================================
+   LEVEL BADGES (Fiverr style)
+   ============================================ */
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.level-1 { color: #1DBF73; }
+.level-2 { color: #1DBF73; }
+.level-top { color: #FFB33E; }
+.level-pro { color: #0D084D; }
