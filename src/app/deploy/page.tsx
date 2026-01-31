@@ -33,8 +33,8 @@ const providers = [
     id: "OPENAI",
     name: "OpenAI",
     description: "GPT-4, GPT-4o - Best for general tasks",
-    icon: Sparkles,
-    color: "from-[#10A37F] to-[#0D8A6A]",
+    logo: "/providers/openai.svg",
+    bgColor: "bg-[#10A37F]",
     models: [
       { id: "gpt-4o", name: "GPT-4o", description: "Latest, fastest, smartest" },
       { id: "gpt-4-turbo-preview", name: "GPT-4 Turbo", description: "Great for complex tasks" },
@@ -46,8 +46,8 @@ const providers = [
     id: "ANTHROPIC",
     name: "Anthropic",
     description: "Claude 3.5 - Excellent reasoning",
-    icon: Cpu,
-    color: "from-[#D97706] to-[#B45309]",
+    logo: "/providers/anthropic.svg",
+    bgColor: "bg-[#D97706]",
     models: [
       { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet", description: "Best balance of speed & quality" },
       { id: "claude-3-opus-20240229", name: "Claude 3 Opus", description: "Most capable" },
@@ -59,8 +59,8 @@ const providers = [
     id: "ELIZAOS",
     name: "ElizaOS",
     description: "Agentic OS - Multi-platform AI agents",
-    icon: Bot,
-    color: "from-[#8B5CF6] to-[#6D28D9]",
+    logo: "/providers/elizaos.svg",
+    bgColor: "bg-[#8B5CF6]",
     models: [],
     requiresWebhook: true,
     docsUrl: "https://docs.elizaos.ai",
@@ -70,8 +70,8 @@ const providers = [
     id: "OPENCLAW",
     name: "OpenClaw",
     description: "Personal AI assistant - Local & private",
-    icon: Shield,
-    color: "from-[#EC4899] to-[#BE185D]",
+    logo: "/providers/openclaw.svg",
+    bgColor: "bg-[#EC4899]",
     models: [],
     requiresWebhook: true,
     docsUrl: "https://openclaw.ai",
@@ -81,8 +81,8 @@ const providers = [
     id: "CUSTOM",
     name: "Custom Webhook",
     description: "Use your own AI agent via webhook",
-    icon: Globe,
-    color: "from-[#1DBF73] to-[#19A463]",
+    logo: "/providers/custom.svg",
+    bgColor: "bg-[#1DBF73]",
     models: [],
     requiresWebhook: true,
   },
@@ -458,11 +458,18 @@ export default function DeployAgentPage() {
                     >
                       <div
                         className={cn(
-                          "h-12 w-12 rounded-xl bg-gradient-to-br flex items-center justify-center",
-                          p.color
+                          "h-12 w-12 rounded-xl flex items-center justify-center overflow-hidden",
+                          p.bgColor
                         )}
                       >
-                        <p.icon className="h-6 w-6 text-white" />
+                        <NextImage
+                          src={p.logo}
+                          alt={p.name}
+                          width={28}
+                          height={28}
+                          className="text-white"
+                          style={{ filter: "brightness(0) invert(1)" }}
+                        />
                       </div>
                       <div className="flex-1">
                         <div className="font-semibold">{p.name}</div>

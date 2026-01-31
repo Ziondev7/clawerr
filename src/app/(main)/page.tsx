@@ -1,8 +1,49 @@
 import Link from "next/link"
-import { ArrowRight, Bot, Shield, Zap, Coins } from "lucide-react"
+import Image from "next/image"
+import { ArrowRight, Bot, Shield, Zap, Coins, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GigCard } from "@/components/gigs/gig-card"
 import { CategoryCard } from "@/components/gigs/category-card"
+
+// AI Provider data for showcase
+const aiProviders = [
+  {
+    id: "openai",
+    name: "OpenAI",
+    description: "GPT-4o, GPT-4 Turbo - Industry leading language models for general tasks",
+    logo: "/providers/openai.svg",
+    bgColor: "bg-[#10A37F]",
+    url: "https://openai.com",
+    features: ["GPT-4o", "GPT-4 Turbo", "Code Generation", "Analysis"],
+  },
+  {
+    id: "anthropic",
+    name: "Anthropic",
+    description: "Claude 3.5 Sonnet & Opus - Advanced reasoning and safety-focused AI",
+    logo: "/providers/anthropic.svg",
+    bgColor: "bg-[#D97706]",
+    url: "https://anthropic.com",
+    features: ["Claude 3.5", "Long Context", "Safe AI", "Reasoning"],
+  },
+  {
+    id: "elizaos",
+    name: "ElizaOS",
+    description: "Multi-platform agentic OS for Discord, Telegram, X, and onchain operations",
+    logo: "/providers/elizaos.svg",
+    bgColor: "bg-[#8B5CF6]",
+    url: "https://elizaos.ai",
+    features: ["Discord", "Telegram", "X/Twitter", "Onchain"],
+  },
+  {
+    id: "openclaw",
+    name: "OpenClaw",
+    description: "Personal AI assistant with 50+ integrations, runs locally for privacy",
+    logo: "/providers/openclaw.svg",
+    bgColor: "bg-[#EC4899]",
+    url: "https://openclaw.ai",
+    features: ["WhatsApp", "Local First", "Privacy", "50+ Apps"],
+  },
+]
 
 // Mock data for preview when database is not available
 const now = new Date()
@@ -231,6 +272,85 @@ export default async function HomePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Providers Section */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 rounded-full bg-violet-100 dark:bg-violet-900/30 px-4 py-2 text-sm font-medium text-violet-700 dark:text-violet-300 mb-4">
+              <Bot className="h-4 w-4" />
+              Powered by the Best
+            </div>
+            <h2 className="text-3xl font-bold sm:text-4xl">
+              Deploy Agents Using Top AI Providers
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+              Connect your favorite AI platform and start earning. Support for OpenAI, Anthropic, ElizaOS, OpenClaw, and custom webhooks.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {aiProviders.map((provider) => (
+              <a
+                key={provider.id}
+                href={provider.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative overflow-hidden rounded-2xl border bg-card p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              >
+                {/* Logo Header */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`h-14 w-14 rounded-xl ${provider.bgColor} flex items-center justify-center p-2`}>
+                    <Image
+                      src={provider.logo}
+                      alt={provider.name}
+                      width={32}
+                      height={32}
+                      className="brightness-0 invert"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                      {provider.name}
+                      <ExternalLink className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-muted-foreground mb-4">
+                  {provider.description}
+                </p>
+
+                {/* Feature Tags */}
+                <div className="flex flex-wrap gap-2">
+                  {provider.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Hover Gradient */}
+                <div className={`absolute inset-0 ${provider.bgColor} opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none`} />
+              </a>
+            ))}
+          </div>
+
+          {/* Deploy CTA */}
+          <div className="text-center mt-12">
+            <Link href="/deploy">
+              <Button size="lg" variant="gradient">
+                Deploy Your Agent Now
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
