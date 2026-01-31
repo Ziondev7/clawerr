@@ -2,12 +2,19 @@
  * POST /api/agents/deploy
  *
  * Deploy a new AI agent on Clawerr
- * Creates or updates the user's agent profile with AI configuration
+ * Supports multiple agent providers:
+ * - OPENAI: Direct OpenAI API integration
+ * - ANTHROPIC: Direct Anthropic API integration
+ * - ELIZAOS: ElizaOS agentic framework (elizaos.ai)
+ * - OPENCLAW: OpenClaw personal AI assistant (openclaw.ai)
+ * - CUSTOM: Custom webhook-based agents
  */
 
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/db"
 import { getCurrentUser } from "@/lib/auth"
+import { getElizaOSClient, createDefaultCharacter } from "@/lib/elizaos/integration"
+import { getOpenClawClient } from "@/lib/openclaw/integration"
 
 // Simple encryption for API keys (in production, use proper key management)
 function encryptApiKey(key: string): string {
@@ -35,6 +42,11 @@ export async function POST(request: NextRequest) {
       maxTokens,
       temperature,
       autoExecute,
+      // ElizaOS specific
+      elizaCharacter,
+      elizaCharacterId,
+      // OpenClaw specific
+      openclawConfig,
     } = body
 
     // Validate required fields
@@ -67,6 +79,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (provider === "ELIZAOS" && !webhookUrl && !elizaCharacterId) {
+      return NextResponse.json(
+        { error: "Webhook URL or ElizaOS character ID is required" },
+        { status: 400 }
+      )
+    }
+
+    if (provider === "OPENCLAW" && !webhookUrl) {
+      return NextResponse.json(
+        { error: "Webhook URL is required for OpenClaw agents" },
+        { status: 400 }
+      )
+    }
+
     // Validate model based on provider
     const validModels: Record<string, string[]> = {
       OPENAI: [
@@ -82,11 +108,13 @@ export async function POST(request: NextRequest) {
         "claude-3-sonnet-20240229",
         "claude-3-haiku-20240307",
       ],
+      ELIZAOS: [], // ElizaOS uses its own model configuration
+      OPENCLAW: [], // OpenClaw supports multiple models internally
       CUSTOM: [],
     }
 
     if (
-      provider !== "CUSTOM" &&
+      !["CUSTOM", "ELIZAOS", "OPENCLAW"].includes(provider) &&
       model &&
       !validModels[provider]?.includes(model)
     ) {
@@ -98,6 +126,56 @@ export async function POST(request: NextRequest) {
 
     // Encrypt API key if provided
     const encryptedApiKey = apiKey ? encryptApiKey(apiKey) : undefined
+
+    // Register with external agent platforms
+    let elizaId: string | undefined
+    let openclawId: string | undefined
+    let elizaCharacterConfig: object | undefined
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    // Register with ElizaOS if selected
+    if (provider === "ELIZAOS") {
+      try {
+        const elizaClient = getElizaOSClient()
+        const character = elizaCharacter || createDefaultCharacter(name, capabilities, systemPrompt)
+
+        const result = await elizaClient.registerAgent({
+          character,
+          characterId: elizaCharacterId,
+          webhookUrl: webhookUrl || `${appUrl}/api/webhooks/elizaos`,
+          capabilities,
+        })
+
+        elizaId = result.agentId
+        elizaCharacterConfig = character
+      } catch (error) {
+        console.error("ElizaOS registration error:", error)
+        // Continue without ElizaOS registration - can be retried later
+      }
+    }
+
+    // Register with OpenClaw if selected
+    if (provider === "OPENCLAW") {
+      try {
+        const openclawClient = getOpenClawClient()
+        if (!openclawClient.connected) {
+          await openclawClient.connect()
+        }
+
+        const result = await openclawClient.registerAgent({
+          agentId: user.id,
+          name,
+          capabilities,
+          webhookUrl: webhookUrl || `${appUrl}/api/webhooks/openclaw`,
+        })
+
+        openclawId = result.openclawId
+      } catch (error) {
+        console.error("OpenClaw registration error:", error)
+        // Continue without OpenClaw registration - can be retried later
+      }
+    }
 
     // Update user to AGENT type and create/update profile
     const updatedUser = await prisma.user.update({
@@ -118,6 +196,9 @@ export async function POST(request: NextRequest) {
               maxTokens: maxTokens || 4096,
               temperature: temperature || 0.7,
               autoExecute: autoExecute !== false,
+              elizaId,
+              openclawId,
+              elizaCharacter: elizaCharacterConfig as any,
             },
             update: {
               capabilities,
@@ -129,6 +210,9 @@ export async function POST(request: NextRequest) {
               maxTokens: maxTokens || undefined,
               temperature: temperature || undefined,
               autoExecute: autoExecute !== false,
+              elizaId: elizaId || undefined,
+              openclawId: openclawId || undefined,
+              elizaCharacter: (elizaCharacterConfig || undefined) as any,
             },
           },
         },

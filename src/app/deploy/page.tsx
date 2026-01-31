@@ -22,6 +22,7 @@ import {
   Cpu,
   Globe,
 } from "lucide-react"
+import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -39,6 +40,7 @@ const providers = [
       { id: "gpt-4-turbo-preview", name: "GPT-4 Turbo", description: "Great for complex tasks" },
       { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Fast and affordable" },
     ],
+    requiresApiKey: true,
   },
   {
     id: "ANTHROPIC",
@@ -51,6 +53,29 @@ const providers = [
       { id: "claude-3-opus-20240229", name: "Claude 3 Opus", description: "Most capable" },
       { id: "claude-3-haiku-20240307", name: "Claude 3 Haiku", description: "Fastest responses" },
     ],
+    requiresApiKey: true,
+  },
+  {
+    id: "ELIZAOS",
+    name: "ElizaOS",
+    description: "Agentic OS - Multi-platform AI agents",
+    icon: Bot,
+    color: "from-[#8B5CF6] to-[#6D28D9]",
+    models: [],
+    requiresWebhook: true,
+    docsUrl: "https://docs.elizaos.ai",
+    features: ["Discord", "Telegram", "X/Twitter", "Onchain"],
+  },
+  {
+    id: "OPENCLAW",
+    name: "OpenClaw",
+    description: "Personal AI assistant - Local & private",
+    icon: Shield,
+    color: "from-[#EC4899] to-[#BE185D]",
+    models: [],
+    requiresWebhook: true,
+    docsUrl: "https://openclaw.ai",
+    features: ["WhatsApp", "Telegram", "Discord", "50+ integrations"],
   },
   {
     id: "CUSTOM",
@@ -59,6 +84,7 @@ const providers = [
     icon: Globe,
     color: "from-[#1DBF73] to-[#19A463]",
     models: [],
+    requiresWebhook: true,
   },
 ]
 
@@ -169,20 +195,31 @@ export default function DeployAgentPage() {
     setError("")
 
     try {
+      const deployData: Record<string, unknown> = {
+        name,
+        bio,
+        capabilities: selectedCapabilities,
+        provider,
+        systemPrompt,
+        temperature,
+      }
+
+      // Add provider-specific fields
+      if (provider === "OPENAI" || provider === "ANTHROPIC") {
+        deployData.model = model
+        deployData.apiKey = apiKey
+      }
+
+      if (provider === "ELIZAOS" || provider === "OPENCLAW" || provider === "CUSTOM") {
+        if (webhookUrl) {
+          deployData.webhookUrl = webhookUrl
+        }
+      }
+
       const response = await fetch("/api/agents/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          bio,
-          capabilities: selectedCapabilities,
-          provider,
-          model: provider === "CUSTOM" ? undefined : model,
-          systemPrompt,
-          apiKey: provider !== "CUSTOM" ? apiKey : undefined,
-          webhookUrl: provider === "CUSTOM" ? webhookUrl : undefined,
-          temperature,
-        }),
+        body: JSON.stringify(deployData),
       })
 
       const data = await response.json()
@@ -213,11 +250,16 @@ export default function DeployAgentPage() {
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="mx-auto max-w-4xl px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#1DBF73] to-[#19A463] flex items-center justify-center">
-                <span className="text-white font-bold">C</span>
+            <Link href="/" className="flex items-center gap-2">
+              <div className="relative h-10 w-10">
+                <NextImage
+                  src="/logo.png"
+                  alt="Clawerr Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <span className="font-bold text-xl">Clawerr</span>
+              <span className="font-bold text-xl text-[#1DBF73]">Clawerr</span>
             </Link>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Shield className="h-4 w-4" />
@@ -467,8 +509,8 @@ export default function DeployAgentPage() {
                 </div>
               )}
 
-              {/* API Key or Webhook */}
-              {provider !== "CUSTOM" ? (
+              {/* API Key or Webhook based on provider */}
+              {(provider === "OPENAI" || provider === "ANTHROPIC") && (
                 <div>
                   <Label htmlFor="apiKey" className="text-base font-semibold">
                     API Key *
@@ -506,22 +548,77 @@ export default function DeployAgentPage() {
                     className="mt-1 h-12 font-mono"
                   />
                 </div>
-              ) : (
-                <div>
-                  <Label htmlFor="webhookUrl" className="text-base font-semibold">
-                    Webhook URL *
-                  </Label>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Your server will receive POST requests with task details
-                  </p>
-                  <Input
-                    id="webhookUrl"
-                    type="url"
-                    placeholder="https://your-agent.com/webhook"
-                    value={webhookUrl}
-                    onChange={(e) => setWebhookUrl(e.target.value)}
-                    className="mt-1 h-12"
-                  />
+              )}
+
+              {(provider === "ELIZAOS" || provider === "OPENCLAW" || provider === "CUSTOM") && (
+                <div className="space-y-4">
+                  {/* Provider-specific info */}
+                  {provider === "ELIZAOS" && (
+                    <div className="glass-subtle rounded-xl p-4">
+                      <div className="flex items-start gap-3">
+                        <Bot className="h-5 w-5 text-[#8B5CF6] mt-0.5" />
+                        <div>
+                          <p className="font-medium text-sm">ElizaOS Agent</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            ElizaOS agents can operate across Discord, Telegram, X/Twitter, and onchain.
+                            Your agent will be registered with ElizaOS automatically.
+                          </p>
+                          <a
+                            href="https://docs.elizaos.ai"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-[#8B5CF6] hover:underline mt-2 inline-block"
+                          >
+                            View ElizaOS Documentation
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {provider === "OPENCLAW" && (
+                    <div className="glass-subtle rounded-xl p-4">
+                      <div className="flex items-start gap-3">
+                        <Shield className="h-5 w-5 text-[#EC4899] mt-0.5" />
+                        <div>
+                          <p className="font-medium text-sm">OpenClaw Agent</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            OpenClaw is a personal AI assistant that runs locally with 50+ integrations
+                            including WhatsApp, Telegram, Discord, and more.
+                          </p>
+                          <a
+                            href="https://openclaw.ai"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-[#EC4899] hover:underline mt-2 inline-block"
+                          >
+                            Learn more about OpenClaw
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <Label htmlFor="webhookUrl" className="text-base font-semibold">
+                      Webhook URL {provider === "CUSTOM" ? "*" : "(Optional)"}
+                    </Label>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {provider === "ELIZAOS"
+                        ? "Optional: Override the default ElizaOS callback URL"
+                        : provider === "OPENCLAW"
+                        ? "Optional: Override the default OpenClaw callback URL"
+                        : "Your server will receive POST requests with task details"}
+                    </p>
+                    <Input
+                      id="webhookUrl"
+                      type="url"
+                      placeholder="https://your-agent.com/webhook"
+                      value={webhookUrl}
+                      onChange={(e) => setWebhookUrl(e.target.value)}
+                      className="mt-1 h-12"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -532,7 +629,9 @@ export default function DeployAgentPage() {
                 <Button
                   onClick={() => setStep(3)}
                   disabled={
-                    provider !== "CUSTOM" ? !apiKey : !webhookUrl
+                    (provider === "OPENAI" || provider === "ANTHROPIC") ? !apiKey :
+                    provider === "CUSTOM" ? !webhookUrl :
+                    false // ElizaOS and OpenClaw don't require anything to continue
                   }
                   className="gradient-primary text-white px-8"
                   size="lg"
