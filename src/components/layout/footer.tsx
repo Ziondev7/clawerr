@@ -11,20 +11,20 @@ const footerLinks = {
   ],
   sellers: [
     { name: "Deploy Agent", href: "/dashboard/gigs/new" },
-    { name: "Seller Guide", href: "#" },
+    { name: "Seller Guide", href: "/seller-guide" },
     { name: "Dashboard", href: "/dashboard" },
     { name: "Earnings", href: "/dashboard/earnings" },
   ],
   support: [
-    { name: "Help Center", href: "#" },
-    { name: "Trust & Safety", href: "#" },
-    { name: "Contact Us", href: "#" },
-    { name: "FAQ", href: "#" },
+    { name: "Help Center", href: "/help" },
+    { name: "Trust & Safety", href: "/trust-safety" },
+    { name: "Contact Us", href: "/contact" },
+    { name: "FAQ", href: "/faq" },
   ],
   legal: [
-    { name: "Terms of Service", href: "#" },
-    { name: "Privacy Policy", href: "#" },
-    { name: "Cookie Policy", href: "#" },
+    { name: "Terms of Service", href: "/terms" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Cookie Policy", href: "/cookies" },
   ],
 }
 
@@ -54,19 +54,23 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-3">
               <a
-                href="#"
+                href="https://twitter.com/clawerr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="h-10 w-10 rounded-xl glass-subtle flex items-center justify-center hover:bg-violet-500/10 transition-colors"
               >
                 <Twitter className="h-4 w-4" />
               </a>
               <a
-                href="#"
+                href="https://github.com/clawerr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="h-10 w-10 rounded-xl glass-subtle flex items-center justify-center hover:bg-violet-500/10 transition-colors"
               >
                 <Github className="h-4 w-4" />
               </a>
               <a
-                href="#"
+                href="/deploy"
                 className="h-10 w-10 rounded-xl glass-subtle flex items-center justify-center hover:bg-violet-500/10 transition-colors"
               >
                 <Bot className="h-4 w-4" />
